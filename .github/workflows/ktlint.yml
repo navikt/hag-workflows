@@ -1,0 +1,21 @@
+name: Ktlint
+
+on:
+  workflow_call:
+    inputs:
+      ktlint-version:
+        required: true
+        type: string
+
+jobs:
+  ktlint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install ktlint
+        uses: nbadal/action-ktlint-setup@v1
+        with:
+          ktlint_version: ${{ inputs.ktlint-version }}
+
+      - run: ktlint

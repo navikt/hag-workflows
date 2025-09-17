@@ -1,0 +1,42 @@
+name: Build with publish
+
+on:
+  workflow_call:
+    inputs:
+      publish:
+        required: false
+        type: boolean
+        default: false
+      publish-snapshot:
+        description: 'Krever `tasks.register("printVersion") { println(project.version) }` i `build.gradle.kts`'
+        required: false
+        type: boolean
+        default: false
+
+jobs:
+  build_with_publish:
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    env:
+      ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v5
+
+      - uses: actions/setup-java@v5
+        with:
+          java-version: 21
+          distribution: temurin
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Build
+        run: ./gradlew build
+
+      - name: Publish
+        if: ${{ inputs.publish }}
+        run: ./gradlew publish
+
+      - name: Publish snapshot
+        if: ${{ inputs.publish-snapshot }}
+        run: ./gradlew publish -Pversion=$(./gradlew printVersion --quiet)-SNAPSHOT
