@@ -39,4 +39,4 @@ jobs:
 
       - name: Publish snapshot
         if: ${{ inputs.publish-snapshot }}
-        run: ./gradlew publish -Pversion=$(./gradlew printVersion --quiet)-SNAPSHOT
+        run: ./gradlew publish -Pversion='$(./gradlew printVersion --quiet)-SNAPSHOT'
