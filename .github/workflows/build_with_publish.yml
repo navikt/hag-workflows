@@ -2,16 +2,6 @@ name: Build with publish
 
 on:
   workflow_call:
-    inputs:
-      publish:
-        required: false
-        type: boolean
-        default: false
-      publish-snapshot:
-        description: 'Krever `tasks.register("printVersion") { println(project.version) }` i `build.gradle.kts`'
-        required: false
-        type: boolean
-        default: false
 
 jobs:
   build_with_publish:
@@ -31,12 +21,46 @@ jobs:
       - uses: gradle/actions/setup-gradle@v4
 
       - name: Build
-        run: ./gradlew build
+        run: |
+          if ./gradlew tasks | grep -wq ^lintKotlin; then
+            ./gradlew build -x lintKotlin
+          else
+            ./gradlew build
+          fi
 
       - name: Publish
-        if: ${{ inputs.publish }}
+        if: github.ref_name == 'main'
         run: ./gradlew publish
 
+      - name: Determine snapshot props
+        if: startsWith(github.ref_name, 'dev/')
+        id: snapshot-props
+        run: |
+          props=$(./gradlew properties --quiet)
+
+          group=$(echo "$props" | grep '^group:' | cut -d ' ' -f 2)
+          name=$(echo "$props" | grep '^name:' | cut -d ' ' -f 2)
+          packageName=$group.$name
+          echo "package-name=$packageName" >> $GITHUB_OUTPUT
+          echo Package name: $packageName
+
+          version=$(echo "$props" | grep '^version:' | cut -d ' ' -f 2)
+          if [[ ! "$version" =~ -SNAPSHOT$ ]]; then
+            version="$version-SNAPSHOT"
+          fi
+          echo "version=$version" >> $GITHUB_OUTPUT
+          echo Snapshot version: $version
+
+      - name: Delete old snapshot
+        uses: actions/delete-package-versions@v5
+        if: steps.snapshot-props.outcome == 'success'
+        with:
+          package-type: maven
+          package-name: ${{ steps.snapshot-props.outputs.package-name }}
+          num-old-versions-to-delete: 1
+          # Matcher alt unntatt bestemt snapshot-versjon
+          ignore-versions: ^(?!${{ steps.snapshot-props.outputs.version }}$).*
+
       - name: Publish snapshot
-        if: ${{ inputs.publish-snapshot }}
-        run: ./gradlew publish -Pversion=$(./gradlew printVersion --quiet)-SNAPSHOT
+        if: steps.snapshot-props.outcome == 'success'
+        run: ./gradlew publish -Pversion=${{ steps.snapshot-props.outputs.version }}
