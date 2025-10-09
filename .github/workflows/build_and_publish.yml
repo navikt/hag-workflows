@@ -1,10 +1,10 @@
-name: Build with publish
+name: Build and publish
 
 on:
   workflow_call:
 
 jobs:
-  build_with_publish:
+  build_and_publish:
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -22,21 +22,21 @@ jobs:
 
       - name: Build
         run: |
-          if ./gradlew tasks | grep -wq ^lintKotlin; then
-            ./gradlew build -x lintKotlin
+          if ./gradlew tasks --console=plain | grep -wq ^lintKotlin; then
+            ./gradlew build -x lintKotlin --console=plain
           else
-            ./gradlew build
+            ./gradlew build --console=plain
           fi
 
       - name: Publish
         if: github.ref_name == 'main'
-        run: ./gradlew publish
+        run: ./gradlew publish --console=plain
 
       - name: Determine snapshot props
         if: startsWith(github.ref_name, 'dev/')
         id: snapshot-props
         run: |
-          props=$(./gradlew properties --quiet)
+          props=$(./gradlew properties --quiet --console=plain)
 
           group=$(echo "$props" | grep '^group:' | cut -d ' ' -f 2)
           name=$(echo "$props" | grep '^name:' | cut -d ' ' -f 2)
