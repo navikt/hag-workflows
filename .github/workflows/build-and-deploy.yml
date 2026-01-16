@@ -1,0 +1,66 @@
+name: Build and deploy
+
+on:
+  workflow_call:
+    inputs:
+      environment:
+        required: true
+        type: string
+      nais-manifest:
+        required: true
+        type: string
+      nais-manifest-vars:
+        required: false
+        type: string
+        default: ''
+      project-id:
+        required: true
+        type: string
+    secrets:
+      identity-provider:
+        required: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    outputs:
+      docker-image: ${{ steps.docker-push.outputs.image }}
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/setup-java@v5
+        with:
+          java-version: 21
+          distribution: temurin
+
+      - uses: gradle/actions/setup-gradle@v5
+
+      - name: Build
+        run: ./gradlew build --console=plain
+        env:
+          ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push docker image
+        uses: nais/docker-build-push@v0
+        id: docker-push
+        with:
+          team: helsearbeidsgiver
+          project_id: ${{ inputs.project-id }}
+          identity_provider: ${{ secrets.identity-provider }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    needs: build
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: nais/deploy/actions/deploy@v2
+        env:
+          CLUSTER: ${{ inputs.environment }}-gcp
+          WORKLOAD_IMAGE: ${{ needs.build.outputs.docker-image }}
+          RESOURCE: ${{ inputs.nais-manifest }}
+          VARS: ${{ inputs.nais-manifest-vars }}
