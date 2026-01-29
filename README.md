@@ -20,8 +20,7 @@ on:
   # for dev, bruk denne
   push:
     branches:
-      - main
-      - dev/**
+      - '**'
 
 jobs:
   build-and-deploy:
