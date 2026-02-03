@@ -13,20 +13,8 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
-      - uses: actions/setup-java@v5
-        with:
-          java-version: 21
-          distribution: temurin
-
-      - uses: gradle/actions/setup-gradle@v5
-
       - name: Build
-        run: |
-          if ./gradlew tasks --console=plain | grep -wq ^lintKotlin; then
-            ./gradlew build -x lintKotlin --console=plain
-          else
-            ./gradlew build --console=plain
-          fi
+        uses: ./.github/actions/build
 
       - name: Publish
         if: github.ref_name == 'main'

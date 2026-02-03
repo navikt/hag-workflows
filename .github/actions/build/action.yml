@@ -1,0 +1,22 @@
+name: Build
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-java@v5
+      with:
+        java-version: 21
+        distribution: temurin
+
+    - uses: gradle/actions/setup-gradle@v5
+
+    - name: Build
+      env:
+        ORG_GRADLE_PROJECT_githubPassword: ${{ github.token }}
+      shell: bash
+      run: |
+        if ./gradlew tasks --console=plain | grep -wq ^lintKotlin; then
+          ./gradlew build -x lintKotlin --console=plain
+        else
+          ./gradlew build --console=plain
+        fi
