@@ -16,6 +16,10 @@ on:
       project-id:
         required: true
         type: string
+      java-version:
+        required: false
+        type: string
+        default: 21
     secrets:
       identity-provider:
         required: true
@@ -28,6 +32,8 @@ jobs:
 
       - name: Build
         uses: navikt/hag-workflows/.github/actions/build@main
+        with:
+          java-version: ${{ inputs.java-version }}
 
   docker-image:
     runs-on: ubuntu-latest
