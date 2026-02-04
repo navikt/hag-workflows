@@ -1,11 +1,16 @@
 name: Build
 
+inputs:
+  java-version:
+    description: Java version used to build
+    required: true
+
 runs:
   using: composite
   steps:
     - uses: actions/setup-java@v5
       with:
-        java-version: 21
+        java-version: ${{ inputs.java-version }}
         distribution: temurin
 
     - uses: gradle/actions/setup-gradle@v5
