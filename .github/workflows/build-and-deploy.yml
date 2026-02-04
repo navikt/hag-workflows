@@ -56,6 +56,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - run: |
+          echo "Output docker image: ${{ needs.build.outputs.docker-image }}"
+
       - uses: nais/deploy/actions/deploy@v2
         env:
           CLUSTER: ${{ inputs.environment }}-gcp
