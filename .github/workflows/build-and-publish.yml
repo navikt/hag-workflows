@@ -19,7 +19,7 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Build
-        uses: ./.github/actions/build
+        uses: navikt/hag-workflows/.github/actions/build@main
         with:
           java-version: ${{ inputs.java-version }}
 
