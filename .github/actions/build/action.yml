@@ -1,4 +1,5 @@
 name: Build
+description: Set up Java and Gradle, and build the project.
 
 inputs:
   java-version:
@@ -10,10 +11,12 @@ runs:
   steps:
     - uses: actions/setup-java@v5
       with:
-        java-version: ${{ inputs.java-version }}
         distribution: temurin
+        java-version: ${{ inputs.java-version }}
 
-    - uses: gradle/actions/setup-gradle@v5
+    - uses: gradle/actions/setup-gradle@v6
+      with:
+        cache-provider: basic
 
     - name: Build
       env:
