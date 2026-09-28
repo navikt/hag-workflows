@@ -20,6 +20,10 @@ on:
         required: false
         type: string
         default: 21
+      use-apply:
+        required: false
+        type: boolean
+        default: false
     secrets:
       identity-provider:
         required: true
@@ -32,7 +36,7 @@ jobs:
     outputs:
       docker-image: ${{ steps.docker-push.outputs.image }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Build
         uses: navikt/hag-workflows/.github/actions/build@main
@@ -55,11 +59,24 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - uses: nais/deploy/actions/deploy@v2
+        if: ${{ !inputs.use-apply }}
         env:
           CLUSTER: ${{ inputs.environment }}-gcp
           WORKLOAD_IMAGE: ${{ needs.build.outputs.docker-image }}
           RESOURCE: ${{ inputs.nais-manifest }}
           VARS: ${{ inputs.nais-manifest-vars }}
+
+      # Alt etter denne kommentaren er for ny deploy-metode med nais-apply.
+      - uses: nais/setup@v1
+        if: inputs.use-apply
+
+      - name: Deploy
+        if: inputs.use-apply
+        run: |
+          nais apply .nais/app.yml \
+            --environment ${{ inputs.environment }}-gcp \
+            --set spec.image="${{ needs.build.outputs.docker-image }}" \
+            --wait
