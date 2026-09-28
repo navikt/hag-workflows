@@ -1,0 +1,13 @@
+name: Dependency submission
+
+# Dette er _ikke_ en reusable workflow.
+on:
+  schedule:
+    # Hver onsdag kl. 04:00
+    - cron: '0 4 * * 3'
+
+jobs:
+  dependency-submission:
+    uses: ./.github/workflows/dependency-submission.yml
+    permissions:
+      contents: write
