@@ -72,6 +72,8 @@ jobs:
       # Alt etter denne kommentaren er for ny deploy-metode med nais-apply.
       - uses: nais/setup@v1
         if: inputs.use-apply
+        with:
+          team: helsearbeidsgiver
 
       - name: Deploy
         if: inputs.use-apply
