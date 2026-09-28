@@ -8,6 +8,9 @@ En samling av gjenbrukbare workflows for [GitHub Actions](https://github.com/fea
 
 Eksemplene under beskriver hvordan de ulike workflowene kan tas i bruk. Triggerne under `on` er veiledende.
 
+**Merknad**: `build-and-deploy` og `build-and-publish` bruker enkel, open-source og fullstendig gratis caching fra `gradle/actions/setup-gradle`. Alternativet er avansert caching som er gratis å bruke i åpne repoer, men ikke i private repoer.
+Dette er, i skrivende stund, en ny endring. Les mer [her](https://blog.gradle.org/choice-clarity-future-caching-gradle-actions).
+
 ### build-and-deploy
 
 ```yml
