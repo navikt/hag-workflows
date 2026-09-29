@@ -6,13 +6,6 @@ on:
       environment:
         required: true
         type: string
-      nais-manifest:
-        required: true
-        type: string
-      nais-manifest-vars:
-        required: false
-        type: string
-        default: ''
       project-id:
         required: true
         type: string
@@ -20,10 +13,6 @@ on:
         required: false
         type: string
         default: 21
-      use-apply:
-        required: false
-        type: boolean
-        default: false
     secrets:
       identity-provider:
         required: true
@@ -61,22 +50,11 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - uses: nais/deploy/actions/deploy@v2
-        if: ${{ !inputs.use-apply }}
-        env:
-          CLUSTER: ${{ inputs.environment }}-gcp
-          WORKLOAD_IMAGE: ${{ needs.build.outputs.docker-image }}
-          RESOURCE: ${{ inputs.nais-manifest }}
-          VARS: ${{ inputs.nais-manifest-vars }}
-
-      # Alt etter denne kommentaren er for ny deploy-metode med nais-apply.
       - uses: nais/setup@v1
-        if: inputs.use-apply
         with:
           team: helsearbeidsgiver
 
       - name: Deploy
-        if: inputs.use-apply
         run: |
           nais apply .nais/app.yml \
             --environment ${{ inputs.environment }}-gcp \
