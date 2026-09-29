@@ -13,6 +13,8 @@ Dette er, i skrivende stund, en ny endring. Les mer [her](https://blog.gradle.or
 
 ### build-and-deploy
 
+Krever manifest i `.nais/app.yml` og [mixins](https://docs.nais.io/build/explanations/environment-mixins/) i `.nais/app.<dev|prod>-gcp.yml`.
+
 ```yml
 name: Build and deploy
 
@@ -32,8 +34,6 @@ jobs:
       id-token: write
     with:
       environment: <dev|prod>
-      nais-manifest: <path-to-nais-manifest.yml>
-      nais-manifest-vars: <path-to-nais-manifest-vars.yml> # optional
       project-id: ${{ vars.NAIS_MANAGEMENT_PROJECT_ID }}
     secrets:
       identity-provider: ${{ secrets.NAIS_WORKLOAD_IDENTITY_PROVIDER }}
