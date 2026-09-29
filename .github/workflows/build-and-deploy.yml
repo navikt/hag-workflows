@@ -12,7 +12,7 @@ on:
       java-version:
         required: false
         type: string
-        default: 21
+        default: 25
     secrets:
       identity-provider:
         required: true
