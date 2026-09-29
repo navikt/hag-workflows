@@ -6,20 +6,13 @@ on:
       environment:
         required: true
         type: string
-      nais-manifest:
-        required: true
-        type: string
-      nais-manifest-vars:
-        required: false
-        type: string
-        default: ''
       project-id:
         required: true
         type: string
       java-version:
         required: false
         type: string
-        default: 21
+        default: 25
     secrets:
       identity-provider:
         required: true
@@ -32,7 +25,7 @@ jobs:
     outputs:
       docker-image: ${{ steps.docker-push.outputs.image }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Build
         uses: navikt/hag-workflows/.github/actions/build@main
@@ -55,11 +48,15 @@ jobs:
     permissions:
       id-token: write
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
-      - uses: nais/deploy/actions/deploy@v2
-        env:
-          CLUSTER: ${{ inputs.environment }}-gcp
-          WORKLOAD_IMAGE: ${{ needs.build.outputs.docker-image }}
-          RESOURCE: ${{ inputs.nais-manifest }}
-          VARS: ${{ inputs.nais-manifest-vars }}
+      - uses: nais/setup@v1
+        with:
+          team: helsearbeidsgiver
+
+      - name: Deploy
+        run: |
+          nais apply .nais/app.yml \
+            --environment ${{ inputs.environment }}-gcp \
+            --set spec.image="${{ needs.build.outputs.docker-image }}" \
+            --wait
