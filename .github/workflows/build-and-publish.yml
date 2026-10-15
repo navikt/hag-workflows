@@ -16,7 +16,7 @@ jobs:
     env:
       ORG_GRADLE_PROJECT_githubPassword: ${{ secrets.GITHUB_TOKEN }}
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
 
       - name: Build
         uses: navikt/hag-workflows/.github/actions/build@main
@@ -47,7 +47,7 @@ jobs:
           echo Snapshot version: $version
 
       - name: Delete old snapshot
-        uses: actions/delete-package-versions@v5
+        uses: actions/delete-package-versions@v5.0.0
         if: steps.snapshot-props.outcome == 'success'
         with:
           package-type: maven
