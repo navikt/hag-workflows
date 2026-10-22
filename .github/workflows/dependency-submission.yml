@@ -15,15 +15,15 @@ jobs:
       # The Dependency Submission API requires write permission
       contents: write
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@v7.0.1
 
-      - uses: actions/setup-java@v6
+      - uses: actions/setup-java@v6.1.0
         with:
           distribution: temurin
           java-version: ${{ inputs.java-version }}
 
       - name: Generate and submit dependency graph
-        uses: gradle/actions/dependency-submission@v6
+        uses: gradle/actions/dependency-submission@v6.4.0
         with:
           cache-provider: basic
         env:
