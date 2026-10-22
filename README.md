@@ -63,8 +63,8 @@ name: Dependency submission
 
 on:
   schedule:
-    # Hver onsdag kl. 04:00
-    - cron: '0 4 * * 3'
+    # Hver dag kl. 04:00
+    - cron: '0 4 * * *'
   push:
     branches:
       - main
@@ -85,7 +85,10 @@ jobs:
 ```yml
 name: Ktlint
 
-on: [pull_request]
+on:
+  pull_request:
+    branches-ignore:
+      - dependabot/**
 
 jobs:
   ktlint:
