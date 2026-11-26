@@ -33,7 +33,7 @@ jobs:
           java-version: ${{ inputs.java-version }}
 
       - name: Build and push docker image
-        uses: nais/docker-build-push@v0
+        uses: nais/docker-build-push@v1
         if: github.event_name == 'release' || (github.event_name == 'push' && (github.ref_name == 'main' || startsWith(github.ref_name, 'dev/')))
         id: docker-push
         with:
